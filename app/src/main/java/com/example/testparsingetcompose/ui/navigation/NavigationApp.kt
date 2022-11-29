@@ -13,9 +13,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 @Composable
-fun NavigationApp(context: ComponentActivity) {
+fun NavigationApp() {
     val navController = rememberNavController()
-    var startDestination: String
+    val startDestination: String
     if(Firebase.auth.currentUser == null) {
         startDestination = AppMainScreens.ConnectionScreen.route
     } else {
@@ -25,15 +25,15 @@ fun NavigationApp(context: ComponentActivity) {
     NavHost(navController = navController, startDestination = startDestination){
         composable(route = AppMainScreens.MainScreen.route){
             BackHandler(true) {}
-            MainScreen(context = context, appNavController = navController)
+            MainScreen(appNavController = navController)
         }
         composable(route = AppMainScreens.ConnectionScreen.route){
             BackHandler(true) {}
-            ConnectionScreen(context = context, navController = navController)
+            ConnectionScreen(navController = navController)
         }
         composable(route = AppMainScreens.RegistrationScreen.route){
             BackHandler(true) {}
-            RegistrationScreen(context = context, navController = navController)
+            RegistrationScreen(navController = navController)
         }
     }
 }

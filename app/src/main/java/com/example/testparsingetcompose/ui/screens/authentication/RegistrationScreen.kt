@@ -1,5 +1,6 @@
 package com.example.testparsingetcompose.ui.screens.authentication
 
+import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -15,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -26,7 +28,6 @@ import com.google.firebase.ktx.Firebase
 
 @Composable
 fun RegistrationScreen(
-    context: ComponentActivity,
     navController: NavController,
 ) {
     Scaffold {
@@ -34,6 +35,8 @@ fun RegistrationScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val mContext = LocalContext.current as Activity
+
             val email = remember { mutableStateOf("") }
             val repeatEmail = remember { mutableStateOf("") }
             val password = remember { mutableStateOf("") }
@@ -102,7 +105,7 @@ fun RegistrationScreen(
                                         email.value.trim(),
                                         password.value.trim()
                                     )
-                                        .addOnCompleteListener(context) { task ->
+                                        .addOnCompleteListener(mContext) { task ->
                                             if (task.isSuccessful) {
                                                 Log.d("AuthLog", "Success")
                                                 val db = Firebase.firestore
@@ -124,13 +127,13 @@ fun RegistrationScreen(
                                                 repeatPassword.value = ""
                                                 repeatEmail.value = ""
                                                 nickname.value = ""
-                                                Toast.makeText(context,"Registration failed", Toast.LENGTH_LONG).show()
+                                                Toast.makeText(mContext,"Registration failed", Toast.LENGTH_LONG).show()
                                             }
                                         }
-                                } else Toast.makeText(context, "Passwords are not equals", Toast.LENGTH_LONG).show()
-                            } else Toast.makeText(context, "Password must be >8 characters and contains Lowercase, Uppercase, Number and Special characters", Toast.LENGTH_LONG).show()
-                        } else Toast.makeText(context, "Emails are not equals", Toast.LENGTH_LONG).show()
-                    } else Toast.makeText(context,"Email invalid", Toast.LENGTH_LONG).show()
+                                } else Toast.makeText(mContext, "Passwords are not equals", Toast.LENGTH_LONG).show()
+                            } else Toast.makeText(mContext, "Password must be >8 characters and contains Lowercase, Uppercase, Number and Special characters", Toast.LENGTH_LONG).show()
+                        } else Toast.makeText(mContext, "Emails are not equals", Toast.LENGTH_LONG).show()
+                    } else Toast.makeText(mContext,"Email invalid", Toast.LENGTH_LONG).show()
                 },
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {

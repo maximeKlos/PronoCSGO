@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TestParsingEtComposeTheme {
-                NavigationApp(context = this)
+                NavigationApp()
             }
         }
     }

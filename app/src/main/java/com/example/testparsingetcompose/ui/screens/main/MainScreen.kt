@@ -20,7 +20,7 @@ import com.example.testparsingetcompose.ui.navigation.NavigationScreen
 import com.example.testparsingetcompose.ui.navigation.NavigationBarScreens
 
 @Composable
-fun MainScreen(context: ComponentActivity, appNavController: NavHostController) {
+fun MainScreen(appNavController: NavHostController) {
     val navController = rememberNavController()
     Scaffold(
         topBar = {
@@ -31,7 +31,7 @@ fun MainScreen(context: ComponentActivity, appNavController: NavHostController) 
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            NavigationScreen(navController = navController, context = context, appNavController = appNavController)
+            NavigationScreen(navController = navController, appNavController = appNavController)
         }
     }
 }

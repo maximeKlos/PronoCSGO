@@ -1,6 +1,5 @@
 package com.example.testparsingetcompose.ui.navigation
 
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -15,7 +14,6 @@ import com.example.testparsingetcompose.ui.screens.upcomingmatches.UpcomingMatch
 @Composable
 fun NavigationScreen(
     navController: NavHostController,
-    context: ComponentActivity,
     appNavController: NavHostController
 ){
     NavHost(
@@ -44,7 +42,7 @@ fun NavigationScreen(
         }
         composable(route = AppMainScreens.ConnectionScreen.route){
             BackHandler(true) {}
-            ConnectionScreen(context = context, navController = navController)
+            ConnectionScreen(navController = navController)
         }
     }
 }
