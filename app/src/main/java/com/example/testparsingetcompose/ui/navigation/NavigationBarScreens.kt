@@ -27,8 +27,8 @@ sealed class NavigationBarScreens(
     )
 
     object Informations : NavigationBarScreens(
-        route = "informations",
-        title = "Informations",
+        route = "information",
+        title = "Information",
         icon = R.drawable.icons_informations
     )
 

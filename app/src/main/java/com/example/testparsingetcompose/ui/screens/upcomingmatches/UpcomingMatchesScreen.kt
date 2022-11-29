@@ -30,7 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import testparsingetcompose.R
 import com.example.testparsingetcompose.data.model.Match
 import com.example.testparsingetcompose.data.model.MatchScore
-import com.example.testparsingetcompose.ui.TeamInfoDisplay
+import com.example.testparsingetcompose.ui.components.TeamInfoDisplay
 import java.sql.Date
 import java.sql.Timestamp
 import java.text.SimpleDateFormat

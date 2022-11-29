@@ -3,7 +3,6 @@ package com.example.testparsingetcompose.ui.screens.authentication
 import android.app.Activity
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
