@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">TestParsingEtCompose</string>
+    <string name="app_name">Prono CS:GO</string>
+    <string name="error_fetching_data">An error as occurred while fetching data</string>
+    <string name="error_not_number">text fields can only contain numbers</string>
 </resources>

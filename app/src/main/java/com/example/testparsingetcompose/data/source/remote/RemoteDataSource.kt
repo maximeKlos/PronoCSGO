@@ -1,66 +1,163 @@
 package com.example.testparsingetcompose.data.source.remote
 
 import android.util.Log
-import com.example.testparsingetcompose.data.MatchesDataSource
+import com.example.testparsingetcompose.data.MyDataSource
 import com.example.testparsingetcompose.data.model.Match
+import com.example.testparsingetcompose.data.model.User
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.example.testparsingetcompose.data.tools.Result
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import org.jsoup.Jsoup
 
 class RemoteDataSource(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-): MatchesDataSource {
+) : MyDataSource {
 
-    override suspend fun getMatches(eventID: Int): Result<List<Match>> = withContext(dispatcher) {
+    override suspend fun getUpcomingMatchesFromHLTV(eventID: Int): Result<List<Match>> =
+        withContext(dispatcher) {
+            return@withContext try {
+                val list = mutableListOf<Match>()
+                val doc = Jsoup.connect("https://www.hltv.org/matches?event=${eventID}").get()
+                val matches = doc.getElementsByClass("upcomingMatch")
+                matches.forEach { match ->
+                    if (match.hasAttr("team1") && match.hasAttr("team2")) {
+                        val format = match.getElementsByClass("matchMeta").text()
+                        val analyticsLink = "https://www.hltv.org/${
+                            match.getElementsByClass("matchAnalytics").attr("href")
+                        }"
+
+                        val matchData = Jsoup.connect(analyticsLink).get()
+                            .getElementsByClass("analytics-header")
+
+                        //Fetching match schedule
+                        val timeUnix = matchData[0].getElementsByClass("event-time").select("span")
+                            .attr("data-unix")
+
+                        val matchId = match.select("a").attr("href").split("/")[2]
+                        //Fetching team 1 data
+                        val team1data = matchData[0].getElementsByClass("analytics-team-1")[0]
+                        val team1LogoURL =
+                            team1data.getElementsByClass("team-logo-container").select("img")
+                                .attr("src")
+                        val team1Name =
+                            team1data.getElementsByClass("team-logo-container").select("img")
+                                .attr("title")
+                        val team1OddVictory =
+                            (team1data.getElementsByClass("team-odds").select("a").text()
+                                .substring(12).toFloat() * 10).toInt()
+
+                        //Fetching team 2 data
+                        val team2data = matchData[0].getElementsByClass("analytics-team-2")[0]
+                        val team2LogoURL =
+                            team2data.getElementsByClass("team-logo-container").select("img")
+                                .attr("src")
+                        val team2Name =
+                            team2data.getElementsByClass("team-logo-container").select("img")
+                                .attr("title")
+                        val team2OddVictory =
+                            (team2data.getElementsByClass("team-odds").select("a").text()
+                                .substring(12).toFloat() * 10).toInt()
+
+                        list.add(
+                            Match(
+                                matchId = matchId,
+                                format = format,
+                                pageLink = analyticsLink,
+                                timeUnix = timeUnix,
+                                team1LogoURL = team1LogoURL,
+                                team1Name = team1Name,
+                                team1OddVictory = team1OddVictory,
+                                team2LogoURL = team2LogoURL,
+                                team2Name = team2Name,
+                                team2OddVictory = team2OddVictory
+                            )
+                        )
+                    }
+                }
+                Result.Success(list)
+            } catch (e: Exception) {
+                Log.d("errorDataParsing", e.message.toString())
+                Result.Error(e)
+            }
+        }
+
+    override suspend fun getResults(eventID: Int): Result<List<Match>> = withContext(dispatcher) {
         return@withContext try {
             val list = mutableListOf<Match>()
-            val doc = Jsoup.connect("https://www.hltv.org/matches?event=${eventID}").get()
-            val match = doc.getElementsByClass("matchAnalytics")
-            for (i in match.indices) {
-                //Récupération du format du match et du lien vers la page d'analyse
-                val format = doc.getElementsByClass("matchMeta")[i].text()
-                val analyticsLink = "https://www.hltv.org/" + match[i].attr("href")
+            val doc = Jsoup.connect("https://www.hltv.org/results?event=${eventID}").get()
+            val allResults = doc.getElementsByClass("result-con")
+            allResults.forEach { result ->
+                val timeUnix = result.attr("data-zonedgrouping-entry-unix")
+                val matchId = result.select("a").attr("href").split("/")[2]
+                val matchPage = "https://www.hltv.org/${result.select("a").attr("href")}"
+                val format = result.getElementsByClass("map-text").text()
 
-                //Récupération des données du match
-                val matchData = Jsoup.connect(analyticsLink).get().getElementsByClass("analytics-header")
+                val tableRow =
+                    result.getElementsByClass("result").select("table").select("tbody").select("tr")
+                        .select("td")
 
-                //Récupération de l'heure du match
-                val timeUnix = matchData[0].getElementsByClass("event-time").select("span").attr("data-unix")
+                val team1Name = tableRow[0].getElementsByClass("team-logo").attr("title")
+                val team1LogoURL = tableRow[0].getElementsByClass("team-logo").attr("src")
+                val team1Score = tableRow[1].selectFirst("span")?.text()!!.toInt()
 
-                //Récupération des données de l'équipe 1
-                val team1data = matchData[0].getElementsByClass("analytics-team-1")[0]
-                val team1LogoURL = team1data.getElementsByClass("team-logo-container").select("img").attr("src")
-                val team1Name = team1data.getElementsByClass("team-logo-container").select("img").attr("title")
-                val team1OddVictory = (team1data.getElementsByClass("team-odds").select("a").text().substring(12) .toFloat() * 10).toInt()
-
-                //Récupération des données de l'équipe 2
-                val team2data = matchData[0].getElementsByClass("analytics-team-2")[0]
-                val team2LogoURL = team2data.getElementsByClass("team-logo-container").select("img").attr("src")
-                val team2Name = team2data.getElementsByClass("team-logo-container").select("img").attr("title")
-                val team2OddVictory = (team2data.getElementsByClass("team-odds").select("a").text().substring(12) .toFloat() * 10).toInt()
+                val team2Name = tableRow[2].getElementsByClass("team-logo").attr("title")
+                val team2LogoURL = tableRow[2].getElementsByClass("team-logo").attr("src")
+                val team2Score =
+                    tableRow[1].selectFirst("span")?.nextElementSibling()?.text()!!.toInt()
 
                 list.add(
                     Match(
+                        matchId = matchId,
                         format = format,
-                        analyticsLink = analyticsLink,
+                        pageLink = matchPage,
                         timeUnix = timeUnix,
                         team1LogoURL = team1LogoURL,
                         team1Name = team1Name,
-                        team1OddVictory = team1OddVictory,
+                        team1Score = team1Score,
                         team2LogoURL = team2LogoURL,
                         team2Name = team2Name,
-                        team2OddVictory = team2OddVictory
+                        team2Score = team2Score
                     )
                 )
             }
 
             Result.Success(list)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Log.d("errorDataParsing", e.message.toString())
             Result.Error(e)
         }
     }
 
+    override suspend fun getUpcomingMatchesFromFirestore(eventID: Int): Result<List<Match>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getUser(): Result<User?> = withContext(dispatcher) {
+        return@withContext try {
+            val db = Firebase.firestore
+            var user: User? = null
+            val document = db.collection("users")
+                .document(Firebase.auth.currentUser!!.uid)
+                .get()
+                .result
+            if (document != null) {
+                Log.d("userGet", "DocumentSnapshot data: ${document.data}")
+                user = User(
+                    document.id,
+                    document.data?.get("isAdmin") as Boolean,
+                    document.data?.get("nickname") as String
+                )
+            } else {
+                Log.d("userGet", "No such document")
+            }
+            Result.Success(user)
+        } catch (e: Exception) {
+            Log.d("errorRetrievingUser", e.message.toString())
+            Result.Error(e)
+        }
+    }
 }

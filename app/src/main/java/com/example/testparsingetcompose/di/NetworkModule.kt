@@ -1,7 +1,7 @@
 package com.example.testparsingetcompose.di
 
-import com.example.testparsingetcompose.data.MatchesDataSource
-import com.example.testparsingetcompose.data.MatchesRepository
+import com.example.testparsingetcompose.data.MyDataSource
+import com.example.testparsingetcompose.data.MyRepository
 import com.example.testparsingetcompose.data.Repository
 import com.example.testparsingetcompose.data.source.remote.RemoteDataSource
 import dagger.Module
@@ -17,7 +17,7 @@ object NetworkModule {
     @Singleton
     @AppModule.RemoteDataSource
     @Provides
-    fun providesRemoteDataSource(): MatchesDataSource {
+    fun providesRemoteDataSource(): MyDataSource {
         return RemoteDataSource()
     }
 }
@@ -29,9 +29,9 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideTasksRepository(
-        @AppModule.RemoteDataSource remoteTaskDataSource: MatchesDataSource
+        @AppModule.RemoteDataSource remoteTaskDataSource: MyDataSource
     ): Repository {
-        return MatchesRepository(
+        return MyRepository(
             remoteTaskDataSource
         )
     }
