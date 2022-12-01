@@ -140,20 +140,16 @@ class RemoteDataSource(
         return@withContext try {
             val db = Firebase.firestore
             var user: User? = null
-            val document = db.collection("users")
-                .document(Firebase.auth.currentUser!!.uid)
+            db.collection("users")
+                .document(Firebase.auth.uid!!)
                 .get()
-                .result
-            if (document != null) {
-                Log.d("userGet", "DocumentSnapshot data: ${document.data}")
-                user = User(
-                    document.id,
-                    document.data?.get("isAdmin") as Boolean,
-                    document.data?.get("nickname") as String
-                )
-            } else {
-                Log.d("userGet", "No such document")
-            }
+                .addOnSuccessListener { result ->
+                    user = User(
+                        userID = result.id,
+                        isAdmin = result.data?.get("isAdmin") as Boolean,
+                        nickname = result.data?.get("nickname") as String
+                    )
+                }
             Result.Success(user)
         } catch (e: Exception) {
             Log.d("errorRetrievingUser", e.message.toString())
