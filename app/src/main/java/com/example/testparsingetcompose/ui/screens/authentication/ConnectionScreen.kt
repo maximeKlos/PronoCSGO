@@ -2,7 +2,6 @@ package com.example.testparsingetcompose.ui.screens.authentication
 
 import android.app.Activity
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,7 +29,7 @@ fun ConnectionScreen(
     val auth = Firebase.auth
     val mContext = LocalContext.current as Activity
 
-    Scaffold() {
+    Scaffold {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

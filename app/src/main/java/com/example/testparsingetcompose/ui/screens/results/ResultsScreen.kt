@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.testparsingetcompose.data.model.Match
-import com.example.testparsingetcompose.ui.TeamInfoDisplay
+import com.example.testparsingetcompose.ui.components.TeamInfoDisplay
 import testparsingetcompose.R
 import java.sql.Date
 import java.sql.Timestamp

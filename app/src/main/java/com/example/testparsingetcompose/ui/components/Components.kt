@@ -1,4 +1,4 @@
-package com.example.testparsingetcompose.ui
+package com.example.testparsingetcompose.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height

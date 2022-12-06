@@ -1,6 +1,5 @@
 package com.example.testparsingetcompose.ui.navigation
 
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
@@ -15,23 +14,23 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun NavigationApp() {
     val navController = rememberNavController()
-    val startDestination: String
-    if(Firebase.auth.currentUser == null) {
-        startDestination = AppMainScreens.ConnectionScreen.route
-    } else {
-        startDestination = AppMainScreens.MainScreen.route
-    }
+    val startDestination =
+        if (Firebase.auth.currentUser == null) {
+            AppMainScreens.ConnectionScreen.route
+        } else {
+            AppMainScreens.MainScreen.route
+        }
 
-    NavHost(navController = navController, startDestination = startDestination){
-        composable(route = AppMainScreens.MainScreen.route){
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(route = AppMainScreens.MainScreen.route) {
             BackHandler(true) {}
             MainScreen(appNavController = navController)
         }
-        composable(route = AppMainScreens.ConnectionScreen.route){
+        composable(route = AppMainScreens.ConnectionScreen.route) {
             BackHandler(true) {}
             ConnectionScreen(navController = navController)
         }
-        composable(route = AppMainScreens.RegistrationScreen.route){
+        composable(route = AppMainScreens.RegistrationScreen.route) {
             BackHandler(true) {}
             RegistrationScreen(navController = navController)
         }
