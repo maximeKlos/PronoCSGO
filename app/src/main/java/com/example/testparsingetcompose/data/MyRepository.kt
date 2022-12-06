@@ -1,6 +1,7 @@
 package com.example.testparsingetcompose.data
 
 import com.example.testparsingetcompose.data.model.Match
+import com.example.testparsingetcompose.data.model.MatchScore
 import com.example.testparsingetcompose.data.model.User
 import com.example.testparsingetcompose.data.tools.Result
 

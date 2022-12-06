@@ -46,7 +46,7 @@ fun UpcomingMatchesScreen(
 
     if (upcomingMatchesList.isEmpty()) {
         LaunchedEffect(upcomingMatchesList) {
-            upcomingMatchesViewModel.parsing(6588)
+            upcomingMatchesViewModel.parsing(6846)
         }
     }
 

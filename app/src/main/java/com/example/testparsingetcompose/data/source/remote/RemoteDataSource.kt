@@ -1,16 +1,16 @@
 package com.example.testparsingetcompose.data.source.remote
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import com.example.testparsingetcompose.data.MyDataSource
 import com.example.testparsingetcompose.data.model.Match
+import com.example.testparsingetcompose.data.model.MatchScore
 import com.example.testparsingetcompose.data.model.User
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.example.testparsingetcompose.data.tools.Result
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 
 class RemoteDataSource(
@@ -138,21 +138,25 @@ class RemoteDataSource(
 
     override suspend fun getUser(): Result<User?> = withContext(dispatcher) {
         return@withContext try {
-            val db = Firebase.firestore
             var user: User? = null
+            val db = Firebase.firestore
+            var retrieveComplete = false
             db.collection("users")
                 .document(Firebase.auth.uid!!)
                 .get()
                 .addOnSuccessListener { result ->
                     user = User(
-                        userID = result.id,
-                        isAdmin = result.data?.get("isAdmin") as Boolean,
-                        nickname = result.data?.get("nickname") as String
-                    )
+                            userID = result.id,
+                            isAdmin = result.data?.get("isAdmin") as Boolean,
+                            nickname = result.data?.get("nickname") as String
+                        )
+                }.addOnCompleteListener {
+                    retrieveComplete = true
                 }
+            while (!retrieveComplete){}
             Result.Success(user)
         } catch (e: Exception) {
-            Log.d("errorRetrievingUser", e.message.toString())
+            Log.d("errorDataParsing", e.message.toString())
             Result.Error(e)
         }
     }
